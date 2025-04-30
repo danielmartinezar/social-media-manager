@@ -1,4 +1,4 @@
-# Feature-Based Architecture: Social Media Manager
+# Feature-Based Architecture
 
 ## What is Feature-Based Architecture?
 
