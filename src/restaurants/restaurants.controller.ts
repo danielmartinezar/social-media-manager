@@ -4,6 +4,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { createApiResponse } from '../common/utils/response.utils';
 import { NearbyRestaurantDto } from 'src/common/services/maps/maps.types';
 import { MetaData } from 'src/common/api.type';
+import { ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 
 @Controller('restaurants')
 @UseGuards(JwtAuthGuard)
@@ -11,6 +12,16 @@ export class RestaurantsController {
   constructor(private readonly restaurantsService: RestaurantsService) {}
 
   @Get('nearby')
+  @ApiOperation({ summary: 'Find nearby restaurants by city or coordinates' })
+  @ApiQuery({ name: 'city', required: false })
+  @ApiQuery({ name: 'lat', required: false })
+  @ApiQuery({ name: 'lon', required: false })
+  @ApiQuery({ name: 'currentPage', required: false, example: 1 })
+  @ApiQuery({ name: 'pageSize', required: false, example: 10 })
+  @ApiResponse({
+    status: 200,
+    description: 'List of nearby restaurants returned',
+  })
   async findNearby(
     @Query('city') city?: string,
     @Query('lat') lat?: string,
