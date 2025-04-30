@@ -72,89 +72,57 @@ Location-based restaurant discovery:
 
 ## Technical Stack
 
-| Component | Technology | Description |
+| Component | Technology | Description |  |
+| --- | --- | --- | --- |
+| Framework | NestJS 11 | Modern Node.js framework with dependency injection |  |
+| Database | PostgreSQL 14 | Reliable relational database with JSONB capabilities |  |
+| ORM | TypeORM | Object-Relational Mapping with Active Record pattern |  |
+| Authentication | JWT + Passport | Token-based authentication with strategy patterns |  |
+| Geolocation | OpenStreetMap API | Free geographic data queries |  |
+| Containerization | Docker Compose | Easy development environment setup |  |
+
+## 🛢️ Database Design (PostgreSQL + TypeORM)
+
+### 🧑 Users Table (`users`)
+
+| Column | Type | Constraints |
 | --- | --- | --- |
-| Framework | NestJS 11 | Modern Node.js framework with dependency injection |
-| Database | PostgreSQL 14 | Reliable relational database with JSONB capabilities |
-| ORM | TypeORM | Object-Relational Mapping with Active Record pattern |
-| Authentication | JWT + Passport | Token-based authentication with strategy patterns |
-| Geolocation | OpenStreetMap API | Free geographic data queries |
-| Containerization | Docker Compose | Easy development environment setup |
+| id | UUID | Primary Key |
+| name | String | Required |
+| last_name | String | Required |
+| email | String | Required, Unique |
+| password | String | Hashed |
 
-## Running the Project
+**Relations**:
 
-### Prerequisites
+`User` ⇨ `Transaction` — One-to-Many
 
-- Node.js (v16+)
-- Docker and Docker Compose
-- Git
+---
 
-### Setup Instructions
+### 💸 Transactions Table (`transactions`)
 
-1. **Clone the repository**
-    
-    ```bash
-    git clone https://github.com/username/social-media-manager.git
-    cd social-media-manager
-    
-    ```
-    
-2. **Install dependencies**
-    
-    ```bash
-    npm install
-    
-    ```
-    
-3. **Set up environment variables**
-    
-    ```bash
-    cp .env.example .env
-    # Edit .env file with configuration
-    
-    ```
-    
-4. **Start the development environment**
-    
-    ```bash
-    # Start PostgreSQL and API in development mode
-    docker-compose up -d
-    
-    ```
-    
-5. **Run database migrations**
-    
-    ```bash
-    npm run migration:run
-    
-    ```
-    
-6. **Start the application** (if not using Docker for the API)
-    
-    ```bash
-    # Development mode with hot reloading
-    npm run start:dev
-    
-    # Production mode
-    npm run build
-    npm run start:prod
-    
-    ```
-    
+| Column | Type | Constraints |
+| --- | --- | --- |
+| id | Integer | Primary Key |
+| amount | Number | Required |
+| description | String | Optional |
+| userId | UUID | FK to [users.id](http://users.id/) |
 
-### Testing
+**Relations**:
 
-```bash
-# Run all tests
-npm run test
+`Transaction` ⇨ `User` — Many-to-One
 
-# Run tests with coverage
-npm run test:cov
+---
 
-# Run e2e tests
-npm run test:e2e
+### 🚫 Blacklisted Tokens Table (`blacklisted_tokens`)
 
-```
+| Column | Type | Constraints |
+| --- | --- | --- |
+| id | Integer | Primary Key |
+| jti | String | Unique, Indexed |
+| expires_at | TimestampTZ | Indexed |
+
+Used to revoke JWTs upon logout.
 
 ## Optimized Project Structure
 
@@ -243,3 +211,78 @@ This structure ensures each feature is fully encapsulated with its own component
 | Endpoint | Method | Authentication | Query Parameters | Response |
 | --- | --- | --- | --- | --- |
 | `/restaurants/nearby` | GET | JWT Bearer | `city` (string) OR `lat` (string) & `lon` (string), `currentPage`(default: 1), `pageSize`(default: 10) | `{ "statusCode": 200, "message": "Nearby restaurants fetched successfully", "data": [...], "meta": {...} }` |
+
+# Running the Project
+
+### Prerequisites
+
+- Node.js (v16+)
+- Docker and Docker Compose
+- Git
+
+### Setup Instructions
+
+1. **Clone the repository**
+    
+    ```bash
+    git clone https://github.com/username/social-media-manager.git
+    cd social-media-manager
+    
+    ```
+    
+2. **Install dependencies**
+    
+    ```bash
+    npm install
+    
+    ```
+    
+3. **Set up environment variables**
+    
+    ```bash
+    cp .env.example .env
+    # Edit .env file with configuration
+    
+    ```
+    
+4. **Start the development environment**
+    
+    ```bash
+    # Start PostgreSQL and API in development mode
+    docker-compose up -d
+    
+    ```
+    
+5. **Run database migrations**
+    
+    ```bash
+    npm run migration:run
+    
+    ```
+    
+6. **Start the application** (if not using Docker for the API)
+    
+    ```bash
+    # Development mode with hot reloading
+    npm run start:dev
+    
+    # Production mode
+    npm run build
+    npm run start:prod
+    
+    ```
+    
+
+### Testing
+
+```bash
+# Run all tests
+npm run test
+
+# Run tests with coverage
+npm run test:cov
+
+# Run e2e tests
+npm run test:e2e
+
+```
